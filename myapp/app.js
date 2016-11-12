@@ -1,25 +1,20 @@
 /**
  * Created by TheSpine on 12/11/16.
  */
-
-class Character{
-    constructor(x, y, name) {
-        this.x = x;
-        this.y = y;
-        this.name = name;
-    }
-    move(dX, dY) {
-        this.x += dX;
-        this.y += dY;
-    }
-}
+var Dungeon = require("dungeon-generator")
+var posix = require('posix')
+var express = require('express')
+var url = require('url')
 
 var players = {}
 var occupiedPos = {}
-var Dungeon = require("dungeon-generator")
-var url = require('url')
-var express = require('express')
 var app = express()
+var server = app.listen(3000);
+var output = [];
+var floors = [];
+var scanCount = 0;
+
+app.use(express.static('public'));
 
 var dungeon = new Dungeon({
     size: [100, 100],
@@ -45,11 +40,22 @@ var dungeon = new Dungeon({
     room_count: 10
 });
 
+posix.setrlimit('nofile', { soft: 10000});
 dungeon.generate()
+createDungeon()
 
-app.get('/', function (req, res) {
-    res.send('Hello World!')
-})
+class Character{
+    constructor(x, y, name) {
+        this.x = x;
+        this.y = y;
+        this.name = name;
+    }
+    move(dX, dY) {
+        this.x += dX;
+        this.y += dY;
+    }
+}
+
 
 function createCharacter(x, y, name) {
     players[name] = new Character(x, y, name);
@@ -60,8 +66,6 @@ function moveCharacter(dx, dy, name) {
     var y = players[name].y;
     var newX = x + dx;
     var newY = y + dy;
-    console.log(newX);
-    console.log(newY);
     if (output[newX][newY] === 0) { //not walking into wall
         output[x][y] = 0;
         output[newX][newY] = 2;
@@ -69,8 +73,7 @@ function moveCharacter(dx, dy, name) {
     }
 }
 
-var output = [];
-var floors = [];
+
 function createDungeon() {
     for (i = 0; i < dungeon.size[0]; i++) {
         var temp = [];
@@ -88,15 +91,13 @@ function createDungeon() {
     }
 }
 
-createDungeon()
+app.get('/', function (req, res) {
+    res.send('Hello World!')
+})
+
 app.get('/foo', function(req, res) {
     var url_parts = url.parse(req.url, true);
     var query = url_parts.query;
-    if (query.command !== 'scan') {
-        console.log("hej")
-    } else {
-        console.log("scan?")
-    }
     if (query['command'] === 'create') {
         do {
             var position = floors[Math.floor(Math.random()*floors.length)];
@@ -107,12 +108,13 @@ app.get('/foo', function(req, res) {
         createCharacter(x, y, query['name']);
         occupiedPos[x,y] =  true
         output[x][y] = 2;
+        res.send();
     }
     if (query['command'] === 'move') {
-        console.log("Am i here?")
         var dX = parseInt(query['dx']);
         var dY = parseInt(query['dy']);
         moveCharacter(dX, dY, query['name'])
+        res.send();
     }
     if (query['command'] === 'scan') {
         var sendArray = [];
@@ -129,16 +131,8 @@ app.get('/foo', function(req, res) {
             }
             sendArray.push(line);
         }
-        //console.log(sendArray)
         var foo = {Area: sendArray}
         res.send(foo)
     }
 })
 
-app.get('/bar', function (req, res) {
-    res.send("ping")
-})
-
-app.use(express.static('public'));
-
-var server = app.listen(3000);

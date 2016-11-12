@@ -2,8 +2,39 @@
  * Created by TheSpine on 12/11/16.
  */
 
-
 var name;
+var canvas = document.getElementById('canvas')
+var ctx = canvas.getContext('2d');
+var squareSize = 100;
+var hasCreatedChar = false
+var time = Date.now();
+
+document.onkeydown = function (e) {
+    var nowTime = Date.now();
+    if (nowTime - time < 500) {
+        return;
+    }
+    if (!hasCreatedChar) {
+        return;
+    }
+    if(e.keyCode == 87) {
+        time = nowTime
+        moveChar(0, -1);
+    }
+    else if (e.keyCode == 65) {
+        time = nowTime
+        moveChar(-1,0);
+    }
+    else if (e.keyCode == 83) {
+        time = nowTime
+        moveChar(0, 1);
+    }
+    else if (e.keyCode == 68) {
+        time = nowTime
+        moveChar(1, 0);
+    }
+}
+
 function moveChar(dx,dy) {
     $.ajax({
         url: "/foo?command=move&dx=" + dx + "&dy=" + dy + "&name=" + name,
@@ -11,25 +42,6 @@ function moveChar(dx,dy) {
     })
 }
 
-document.onkeydown = function (e) {
-    if (!hasCreatedChar) {
-        return;
-    }
-    if(e.keyCode == 87) {
-        moveChar(0, -1);
-    }
-    else if (e.keyCode == 65) {
-        moveChar(-1,0);
-    }
-    else if (e.keyCode == 83) {
-        moveChar(0, 1);
-    }
-    else if (e.keyCode == 68) {
-        moveChar(1, 0);
-    }
-}
-
-var hasCreatedChar = false
 function createChar(inputName) {
     if (event.keyCode === 13 && !hasCreatedChar) {
         name = inputName
@@ -57,9 +69,6 @@ setInterval(function () {
     }
 }, 100);
 
-var canvas = document.getElementById('canvas')
-var ctx = canvas.getContext('2d');
-var squareSize = 100;
 
 function drawDungeon(inputArray) {
     ctx.clearRect(0, 0, canvas.width, canvas.width);
