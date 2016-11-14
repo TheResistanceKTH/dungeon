@@ -2,7 +2,6 @@
  * Created by TheSpine on 12/11/16.
  */
 var Dungeon = require("dungeon-generator")
-var posix = require('posix')
 var express = require('express')
 var url = require('url')
 
@@ -40,7 +39,6 @@ var dungeon = new Dungeon({
     room_count: 10
 });
 
-posix.setrlimit('nofile', { soft: 10000});
 dungeon.generate()
 createDungeon()
 
