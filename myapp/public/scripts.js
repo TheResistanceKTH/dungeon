@@ -1,5 +1,5 @@
 /**
- * Created by TheSpine on 12/11/16.
+ * Created by Angus Lothian, Axel Lindeberg & Mattias Larsson on 12/11/16.
  */
 
 var name;
