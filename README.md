@@ -7,10 +7,14 @@ git clone THIS_REPO
 ```
 ## 2
 ```bash
-node app.js
+npm i
 ```
 ## 3
+```bash
+node app.js
+```
+## 4
 <http://localhost:3000/ajax.html>
 
-## 4
+## 5
 ???
